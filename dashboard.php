@@ -11,13 +11,41 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $message = '';
 
+// Predefined categories
+$predefined_categories = ['food', 'travel', 'rent', 'entertainment'];
+
 // Handle expense form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $amount = $_POST['amount'];
     $description = $_POST['description'];
     $date = $_POST['expense_date'];
     $category_id = $_POST['category_id'];
+    $custom_category = $_POST['custom_category'];
 
+    // Insert the category (predefined or custom)
+    if (in_array($category_id, $predefined_categories)) {
+        // Insert predefined category
+        $stmt = $pdo->prepare("INSERT INTO categories (user_id, name) VALUES (?, ?)");
+        if ($stmt->execute([$user_id, ucfirst($category_id)])) {
+            // Get the ID of the newly inserted predefined category
+            $category_id = $pdo->lastInsertId();
+        } else {
+            $message = "Failed to create predefined category.";
+            exit();
+        }
+    } elseif ($category_id == 'custom' && !empty($custom_category)) {
+        // Insert custom category
+        $stmt = $pdo->prepare("INSERT INTO categories (user_id, name) VALUES (?, ?)");
+        if ($stmt->execute([$user_id, $custom_category])) {
+            // Get the ID of the newly inserted custom category
+            $category_id = $pdo->lastInsertId();
+        } else {
+            $message = "Failed to create custom category.";
+            exit();
+        }
+    }
+
+    // Insert the expense
     $stmt = $pdo->prepare("INSERT INTO expenses (user_id, category_id, amount, description, expense_date) VALUES (?, ?, ?, ?, ?)");
     if ($stmt->execute([$user_id, $category_id, $amount, $description, $date])) {
         $message = "Expense added successfully!";
@@ -25,10 +53,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = "Failed to add expense.";
     }
 }
-
-// Get categories
-$categories = $pdo->prepare("SELECT id, name FROM categories WHERE user_id = ? OR user_id IS NULL");
-$categories->execute([$user_id]);
 
 // Get recent expenses
 $expenses = $pdo->prepare("SELECT e.*, c.name as category FROM expenses e 
@@ -50,9 +74,12 @@ $expenses->execute([$user_id]);
         <a class="navbar-brand" href="#">Expense Tracker</a>
         <div>
             <a href="logout.php" class="btn btn-outline-light">Logout</a>
+            <a href="reset-password.php" class="btn btn-warning">Reset Password</a>
+            <a href="budget.php" class="btn btn-outline-light">Manage Budget</a>
         </div>
     </div>
 </nav>
+
 
 <div class="container mt-4">
     <h3 class="mb-4">Welcome to your Dashboard</h3>
@@ -77,13 +104,22 @@ $expenses->execute([$user_id]);
                     </div>
                     <div class="col">
                         <label>Category</label>
-                        <select name="category_id" class="form-select" required>
+                        <select name="category_id" class="form-select" id="category-select" required>
                             <option value="">-- Select --</option>
-                            <?php while ($cat = $categories->fetch(PDO::FETCH_ASSOC)) : ?>
-                                <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
-                            <?php endwhile; ?>
+                            <!-- Predefined Categories -->
+                            <option value="food">Food</option>
+                            <option value="travel">Travel</option>
+                            <option value="rent">Rent</option>
+                            <option value="entertainment">Entertainment</option>
+
+                            <!-- Option for Custom Category -->
+                            <option value="custom">Custom</option>
                         </select>
                     </div>
+                </div>
+                <div class="mb-3" id="custom-category-input" style="display: none;">
+                    <label>Enter Custom Category</label>
+                    <input type="text" name="custom_category" class="form-control" placeholder="Enter custom category name">
                 </div>
                 <div class="mb-3">
                     <label>Description (optional)</label>
@@ -121,6 +157,18 @@ $expenses->execute([$user_id]);
         </div>
     </div>
 </div>
+
+<!-- JavaScript to show/hide the custom category input -->
+<script>
+    document.getElementById('category-select').addEventListener('change', function () {
+        var customCategoryInput = document.getElementById('custom-category-input');
+        if (this.value === 'custom') {
+            customCategoryInput.style.display = 'block';
+        } else {
+            customCategoryInput.style.display = 'none';
+        }
+    });
+</script>
 
 </body>
 </html>
