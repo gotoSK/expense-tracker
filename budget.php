@@ -28,12 +28,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($existing_budget) {
             // Update the existing budget
-            $stmt = $pdo->prepare("UPDATE budgets SET budget_amount = ? WHERE user_id = ? AND category_id = ?");
+            $stmt = $pdo->prepare("UPDATE budgets SET limit_amount = ? WHERE user_id = ? AND category_id = ?");
             $stmt->execute([$budget_amount, $user_id, $category_id]);
             $message = 'Budget updated successfully!';
         } else {
             // Insert new budget
-            $stmt = $pdo->prepare("INSERT INTO budgets (user_id, category_id, budget_amount) VALUES (?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO budgets (user_id, category_id, limit_amount) VALUES (?, ?, ?)");
             $stmt->execute([$user_id, $category_id, $budget_amount]);
             $message = 'Budget set successfully!';
         }
@@ -79,6 +79,8 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <a class="navbar-brand" href="#">Expense Tracker</a>
         <div>
             <a href="logout.php" class="btn btn-outline-light">Logout</a>
+            <a href="reset-password.php" class="btn btn-warning">Reset Password</a>
+            <a href="dashboard.php" class="btn btn-outline-light">Dashboard</a>
         </div>
     </div>
 </nav>
@@ -135,11 +137,11 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <?php
                             $category_id = $budget['category_id'];
                             $total_spent = isset($spending[$category_id]) ? $spending[$category_id] : 0;
-                            $status = ($total_spent >= $budget['budget_amount']) ? 'Exceeded' : ($total_spent >= $budget['budget_amount'] * 0.8 ? 'Warning' : 'Under Budget');
+                            $status = ($total_spent >= $budget['limit_amount']) ? 'Exceeded' : ($total_spent >= $budget['limit_amount'] * 0.8 ? 'Warning' : 'Under Budget');
                         ?>
                         <tr>
                             <td><?= htmlspecialchars($budget['category_name']) ?></td>
-                            <td>$<?= number_format($budget['budget_amount'], 2) ?></td>
+                            <td>$<?= number_format($budget['limit_amount'], 2) ?></td>
                             <td>$<?= number_format($total_spent, 2) ?></td>
                             <td class="<?= $status === 'Exceeded' ? 'text-danger' : ($status === 'Warning' ? 'text-warning' : 'text-success') ?>"><?= $status ?></td>
                         </tr>

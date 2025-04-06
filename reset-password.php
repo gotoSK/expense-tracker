@@ -59,6 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <a class="navbar-brand" href="#">Expense Tracker</a>
         <div>
             <a href="logout.php" class="btn btn-outline-light">Logout</a>
+            <a href="dashboard.php" class="btn btn-outline-light">Dashboard</a>
         </div>
     </div>
 </nav>

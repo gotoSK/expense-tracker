@@ -24,24 +24,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Insert the category (predefined or custom)
     if (in_array($category_id, $predefined_categories)) {
-        // Insert predefined category
-        $stmt = $pdo->prepare("INSERT INTO categories (user_id, name) VALUES (?, ?)");
-        if ($stmt->execute([$user_id, ucfirst($category_id)])) {
-            // Get the ID of the newly inserted predefined category
-            $category_id = $pdo->lastInsertId();
+        // Check if predefined category already exists for the user
+        $stmt = $pdo->prepare("SELECT id FROM categories WHERE user_id = ? AND name = ?");
+        $stmt->execute([$user_id, ucfirst($category_id)]);
+        $existing_category = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($existing_category) {
+            // If category exists, use the existing category ID
+            $category_id = $existing_category['id'];
         } else {
-            $message = "Failed to create predefined category.";
-            exit();
+            // Insert predefined category
+            $stmt = $pdo->prepare("INSERT INTO categories (user_id, name) VALUES (?, ?)");
+            if ($stmt->execute([$user_id, ucfirst($category_id)])) {
+                // Get the ID of the newly inserted predefined category
+                $category_id = $pdo->lastInsertId();
+            } else {
+                $message = "Failed to create predefined category.";
+                exit();
+            }
         }
     } elseif ($category_id == 'custom' && !empty($custom_category)) {
-        // Insert custom category
-        $stmt = $pdo->prepare("INSERT INTO categories (user_id, name) VALUES (?, ?)");
-        if ($stmt->execute([$user_id, $custom_category])) {
-            // Get the ID of the newly inserted custom category
-            $category_id = $pdo->lastInsertId();
+        // Check if custom category already exists for the user
+        $stmt = $pdo->prepare("SELECT id FROM categories WHERE user_id = ? AND name = ?");
+        $stmt->execute([$user_id, $custom_category]);
+        $existing_category = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($existing_category) {
+            // If category exists, use the existing category ID
+            $category_id = $existing_category['id'];
         } else {
-            $message = "Failed to create custom category.";
-            exit();
+            // Insert custom category
+            $stmt = $pdo->prepare("INSERT INTO categories (user_id, name) VALUES (?, ?)");
+            if ($stmt->execute([$user_id, $custom_category])) {
+                // Get the ID of the newly inserted custom category
+                $category_id = $pdo->lastInsertId();
+            } else {
+                $message = "Failed to create custom category.";
+                exit();
+            }
         }
     }
 
@@ -80,7 +100,6 @@ $expenses->execute([$user_id]);
     </div>
 </nav>
 
-
 <div class="container mt-4">
     <h3 class="mb-4">Welcome to your Dashboard</h3>
 
@@ -105,14 +124,11 @@ $expenses->execute([$user_id]);
                     <div class="col">
                         <label>Category</label>
                         <select name="category_id" class="form-select" id="category-select" required>
-                            <option value="">-- Select --</option>
-                            <!-- Predefined Categories -->
+                            <option value="">Select</option>
                             <option value="food">Food</option>
                             <option value="travel">Travel</option>
                             <option value="rent">Rent</option>
                             <option value="entertainment">Entertainment</option>
-
-                            <!-- Option for Custom Category -->
                             <option value="custom">Custom</option>
                         </select>
                     </div>
@@ -134,6 +150,13 @@ $expenses->execute([$user_id]);
     <div class="card">
         <div class="card-header">Recent Expenses</div>
         <div class="card-body">
+            <!-- Export Buttons -->
+            <div class="mb-3">
+                <a href="report-csv.php?export=csv" class="btn btn-success">Export to CSV</a>
+                <a href="report-pdf.php?export=pdf" class="btn btn-primary">Export to PDF</a>
+            </div>
+            <a href="category_expenses.php">Filter</a>
+            <a href="spending.php">Overview</a>
             <table class="table table-bordered">
                 <thead>
                     <tr>
@@ -158,7 +181,7 @@ $expenses->execute([$user_id]);
     </div>
 </div>
 
-<!-- JavaScript to show/hide the custom category input -->
+<!-- JS to show/hide custom category input -->
 <script>
     document.getElementById('category-select').addEventListener('change', function () {
         var customCategoryInput = document.getElementById('custom-category-input');

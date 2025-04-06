@@ -19,8 +19,8 @@ if (isset($_SESSION['user_id'])) {
 <body class="bg-light">
     <div class="container mt-5">
         <div class="text-center">
-            <h1 class="mb-4">Welcome to the Expense Tracker</h1>
-            <p class="lead">Track your spending, categorize your expenses, and budget better!</p>
+            <h1 class="mb-4">Your expense Tracker System 💰</h1>
+            <p class="lead"> Track spending habits, analyze budget, and make more informed financial decisions!</p>
             <div class="mt-4">
                 <a href="login.php" class="btn btn-primary me-2">Login</a>
                 <a href="register.php" class="btn btn-outline-primary">Register</a>
