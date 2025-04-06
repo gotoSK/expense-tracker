@@ -11,7 +11,6 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $message = '';
 
-// Predefined categories
 $predefined_categories = ['food', 'travel', 'rent', 'entertainment'];
 
 // Handle expense form submission
@@ -22,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $category_id = $_POST['category_id'];
     $custom_category = $_POST['custom_category'];
 
-    // Insert the category (predefined or custom)
+    // Insert the category
     if (in_array($category_id, $predefined_categories)) {
         // Check if predefined category already exists for the user
         $stmt = $pdo->prepare("SELECT id FROM categories WHERE user_id = ? AND name = ?");
@@ -93,15 +92,15 @@ $expenses->execute([$user_id]);
     <div class="container-fluid">
         <a class="navbar-brand" href="#">Expense Tracker</a>
         <div>
-            <a href="logout.php" class="btn btn-outline-light">Logout</a>
-            <a href="reset-password.php" class="btn btn-warning">Reset Password</a>
+            <a href="logout.php" class="btn btn-warning">Logout</a>
+            <a href="reset-password.php" class="btn btn-outline-light">Reset Password</a>
             <a href="budget.php" class="btn btn-outline-light">Manage Budget</a>
         </div>
     </div>
 </nav>
 
 <div class="container mt-4">
-    <h3 class="mb-4">Welcome to your Dashboard</h3>
+    <h3 class="mb-4">Welcome!</h3>
 
     <?php if ($message): ?>
         <div class="alert alert-info"><?= $message ?></div>

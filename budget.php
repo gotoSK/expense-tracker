@@ -78,8 +78,8 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="container-fluid">
         <a class="navbar-brand" href="#">Expense Tracker</a>
         <div>
-            <a href="logout.php" class="btn btn-outline-light">Logout</a>
-            <a href="reset-password.php" class="btn btn-warning">Reset Password</a>
+            <a href="logout.php" class="btn btn-warning">Logout</a>
+            <a href="reset-password.php" class="btn btn-outline-light">Reset Password</a>
             <a href="dashboard.php" class="btn btn-outline-light">Dashboard</a>
         </div>
     </div>
