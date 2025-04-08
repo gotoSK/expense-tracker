@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Redirect to dashboard if already logged in
+// in case user is already logged in
 if (isset($_SESSION['user_id'])) {
     header("Location: dashboard.php");
     exit();
@@ -19,7 +19,7 @@ if (isset($_SESSION['user_id'])) {
 <body class="bg-light">
     <div class="container mt-5">
         <div class="text-center">
-            <h1 class="mb-4">Your expense Tracker System 💰</h1>
+            <h1 class="mb-4">Your expense Tracker System.</h1>
             <p class="lead"> Track spending habits, analyze budget, and make more informed financial decisions!</p>
             <div class="mt-4">
                 <a href="login.php" class="btn btn-primary me-2">Login</a>

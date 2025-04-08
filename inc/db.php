@@ -1,4 +1,5 @@
 <?php
+
 $host = 'localhost';
 $db = 'expense_tracker';
 $user = 'root';
@@ -11,4 +12,5 @@ try {
 } catch (PDOException $e) {
     die("Database connection failed: " . $e->getMessage());
 }
+
 ?>

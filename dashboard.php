@@ -2,7 +2,7 @@
 session_start();
 require_once 'inc/db.php';
 
-// Redirect if not logged in
+// redirect if not logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
@@ -10,10 +10,9 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 $message = '';
-
 $predefined_categories = ['food', 'travel', 'rent', 'entertainment'];
 
-// Handle expense form submission
+// expense form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $amount = $_POST['amount'];
     $description = $_POST['description'];
@@ -21,18 +20,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $category_id = $_POST['category_id'];
     $custom_category = $_POST['custom_category'];
 
-    // Insert the category
+    // insert category to db
+    // if user selects a pre-defined category
     if (in_array($category_id, $predefined_categories)) {
-        // Check if predefined category already exists for the user
+        // check if the same category already exists for this user in db
         $stmt = $pdo->prepare("SELECT id FROM categories WHERE user_id = ? AND name = ?");
         $stmt->execute([$user_id, ucfirst($category_id)]);
         $existing_category = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($existing_category) {
-            // If category exists, use the existing category ID
             $category_id = $existing_category['id'];
         } else {
-            // Insert predefined category
             $stmt = $pdo->prepare("INSERT INTO categories (user_id, name) VALUES (?, ?)");
             if ($stmt->execute([$user_id, ucfirst($category_id)])) {
                 // Get the ID of the newly inserted predefined category
@@ -106,7 +104,7 @@ $expenses->execute([$user_id]);
         <div class="alert alert-info"><?= $message ?></div>
     <?php endif; ?>
 
-    <!-- Add Expense Form -->
+    <!-- 'Add Expense' Form -->
     <div class="card mb-4">
         <div class="card-header">Add New Expense</div>
         <div class="card-body">
@@ -180,7 +178,7 @@ $expenses->execute([$user_id]);
     </div>
 </div>
 
-<!-- JS to show/hide custom category input -->
+<!-- show/hide custom category input -->
 <script>
     document.getElementById('category-select').addEventListener('change', function () {
         var customCategoryInput = document.getElementById('custom-category-input');
